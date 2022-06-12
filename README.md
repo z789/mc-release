@@ -79,7 +79,7 @@ echo 'add /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre/bin/j
       在centos8 stream上安装内核 kernel-5.15.5mc-81.x86_64.rpm:  sudo rpm -ivh kernel-5.15.5mc-81.x86_64.rpm
 
     安装应用程序: 
-     1. 解压安装包  sudo tar -C / mctool.tgz
+     1. 解压安装包  sudo tar -C / -zxvf mctool.tgz
      2. 对系统进行基础签名、设置mime。（测试版本的私钥使用内核模块签名的私钥，正式版本中是独立的私钥和证书）
         sudo /usr/local/bin/mc-sign-mime-tool -sm sha512 /etc/mc/mc_key.pem /etc/mc/mc_key.x509 /
      3. 重启系统，使用新内核， 执行sudo /usr/local/bin/mc-logd -d /var/log/mclog 启动日志精灵进程。 
