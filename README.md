@@ -1,10 +1,10 @@
 # mc-rpm
 
 ## 背景：
-       系统中有一个稳定、可靠的基础安全机制，上层安全才容易做。
-       Linux中的强制访问控制selinux、apparmor等都非常优秀，但配置比较复杂，掌握使用都比较困难，在很多场景下都是关闭的	      。而且都没有运行时验证执行代码(NIST sp800-167)。
-       Iot、云的发展，安全出现新的问题，如勒索、挖矿、rootkit、定制化的攻击、间谍软件、非已知的恶意软件、网络空间军事对抗。
-       需要能简单使用的防御手段：应用程序的白名单，即运行时验证文件的签名。
+    系统中有一个稳定、可靠的基础安全机制，上层安全才容易做。
+    Linux中的强制访问控制selinux、apparmor等都非常优秀，但配置比较复杂，掌握使用都比较困难，在很多场景下都是关闭的。而且都没有运行时验证执行代码(NIST sp800-167)。
+    Iot、云的发展，安全出现新的问题，如勒索、挖矿、rootkit、定制化的攻击、间谍软件、非已知的恶意软件、网络空间军事对抗。
+    需要能简单使用的防御手段：应用程序的白名单，即运行时验证文件的签名。
 
 ## 原则：
     1. 简单。容易理解，实现简单、使用简单.
@@ -48,7 +48,7 @@
     ADD/DEL interp *                                                       //强制验证解释器解释、打开的文件
     上面配置命令里大写的是关键字，关键字不区分大小写，但一般大写以示区别。
 
-   配置规则是向 /proc/sys/kernel/mc/set_interp_rule写入规则. 例如：
+    配置规则是向 /proc/sys/kernel/mc/set_interp_rule写入规则. 例如：
 echo 'add /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre/bin/java magic 0 504b0304140008' >/proc/sys/kernel/mc/set_interp_rule
 
 例子
@@ -119,9 +119,9 @@ echo 'add /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre/bin/j
     2. 总体安全性，取决于对系统的了解程度、对规则的配置精细程度。
     3. 设计适合自己的mime系统，能配置更好的规则，消耗更少的时间。
     4. 优先配置MAGIC规则，其次是MIME规则，最后是忽略路径EPATH规则。 
-      epath尽量少使用，如果使用，尽量精确到文件。如果能设计适合自己的mime系统，完全可以不用epath。
+       epath尽量少使用，如果使用，尽量精确到文件。如果能设计适合自己的mime系统，完全可以不用epath。
 
 ## 参考
-   魔数：https://filesignatures.net/index.php?page=all 或者file 源码的 magic目录
+   魔数：https://filesignatures.net/index.php?page=all 或者file 源码的 magic目录。
    mime-type: file 源码的 magic目录
 
