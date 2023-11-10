@@ -1,0 +1,71 @@
+## 安装与使用：
+    安装新内核:
+        在Ubuntu22.04 上安装内核 linux-image-5.15.5mc_amd64.deb:  sudo dpkg -i linux-image-5.15.5mc_amd64.deb 
+
+    安装应用程序: 
+        1. 解压安装包  sudo tar -C / -zxvf mctool.Ubuntu22.04.tgz
+        2. 对系统进行基础签名、设置mime。（公开版本的私钥使用内核模块签名的私钥,商业版本中是独立的私钥和证书。 
+           此阶段根据系统大小,公开版本可能花费较长时间,例如 1 个小时等, 商业版本提高 8 倍性能）。
+           
+         sudo /usr/local/bin/mc-sign-mime-tool -sm sha512 /etc/mc/mc_key.pem /etc/mc/mc_key.x509 /
+
+        3. 配置日志精灵进程随系统启动： 把/usr/local/bin/mc-logd -dc /var/log/mclog写入rc.local文件, 并设置rc.local文件的执行权限。并启用rc.local服务：systemctl enable rc-local; systemctl start rc-local
+        4. 重启系统，使用刚才安装的内核。
+
+
+
+    启动完成后查看是否启动正常：
+        1. 使用uname -r 查看内核是不是刚才安装的内核: 5.15.5mc
+
+        2. 使用 ps -ef |grep mc-logd 查看日志精灵进程，如果mc-logd存在，说明应用层启动正常。日志存入文件/var/log/mclog。
+
+    
+    试用效果：
+        在“系统进行基础签名、设置mime“完成的前提下， 设置系统为强制模式：  echo 1 > /proc/sys/kernel/mc/enforce。
+
+        这样，随便复制、上传一个(恶意）程序，都不能运行。如：
+        cp /bin/ls . 
+        ./ls
+        结果是： "bash: ./ls: 不允许的操作"
+          
+        
+
+
+
+## mc相关配置目录和文件
+### /proc/sys/kernel/mc 目录：
+    该目录是配置、查看统计信息等的入口。 该目录下有以下文件：
+    enable                             //启用、禁用MC功能。 默认是1，表示启用。
+    enforce                            //mc是否强制模式。   默认是0, 表示不强制，但记录日志。如果系统已经进行基础签名并启动mclog, 可
+                                                  //设置成1，此时，签名验证错误时则拒绝执行。
+    file_format                        //需要验证的执行文件格式集合。   一般不改变该文件值。
+    filename_max_cost                  //统计信息， 验证签名花费时间最大的文件名字，与max_cost对应。
+    interp_rules                       //查询解释器的配置。
+    log_user                           //mc日志发送到应用层 或者内核中打印。 默认是0, 表示内核中打印，mc-logd启动时，则自动设置为1。
+    max_cost                           //统计信息， 验证签名花费的最大时间。 单位是jiffie。
+    max_file_size                      //验证签名的文件最大尺寸，单位字节。默认是314572800，表示300M。
+    num_exe_ima                        //验证编译性程序的数量。
+    num_interp_ima                     //为了验证解释性程序，open、mmap、read的数量。
+    num_lib_ima                        //验证so库的数量。
+    set_interp_rule                    //配置解释器规则的入口。
+    total_cost                         //mc系统总共花费的时间，单位jiffie。
+    match_interp_label                 //按照解释器的路径、标记匹配。 如果设置1, 则按照标记匹配，interp_rules相应的规则也应是主体的标记。一般不需要改变该文件值。
+    alg_name  avail_alg                //这两个文件是计算主体标记的hash算法和可利用算法，默认是sha256。 一般不需要改变该文件值。
+
+### /etc/mc 配置文件目录
+    /etc/mc/mc_key.pem /etc/mc/mc_key.x509   //签名时私钥和证书
+    /etc/mc/interp.conf                      //设置文件mime的配置文件
+
+    /etc/mc/profile/                   //该目录下是解释器的配置脚本。分为两类，一类是按照解释器的绝对路径，另一类是按照解释器的标记
+                                         （标记是解释器的sha256sum)。mc-logd根据启动选项自动选择执行相应的脚本，
+                                         默认是按照解释器的绝对路径。
+
+
+## 建议：
+    1. 没对系统做基础签名、设置mime前，先禁用MC，不然会产生大量日志。 
+    2. 总体安全性，取决于对系统的了解程度、对规则的配置精细程度。
+    3. 设计适合自己的mime系统，能配置更好的规则，消耗更少的时间。
+    4. 优先配置MAGIC规则，其次是MIME规则，最后是忽略路径EPATH规则。 
+      epath尽量少使用，如果使用，尽量精确到文件。如果能设计适合自己的mime系统，完全可以不用epath。
+
+
