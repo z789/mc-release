@@ -63,8 +63,8 @@
 例子
 - java config：
 ```
-      ADD interp DEFAULT [ACCEPT]
-      ADD interp MAGIC [offset magic_word]
+    ADD interp DEFAULT [ACCEPT]
+    ADD interp MAGIC [offset magic_word]
 ```
 
 - python config:
